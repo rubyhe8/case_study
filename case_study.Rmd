@@ -1,0 +1,15 @@
+---
+title: "case_study"
+author: "ruby"
+date: "2025-10-07"
+output: html_document
+---
+
+import dataset 
+```{r}
+library(tidyverse)
+library(p8105.datasets)
+
+data(nyc_airbnb)
+```
+
