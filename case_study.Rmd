@@ -5,11 +5,125 @@ date: "2025-10-07"
 output: html_document
 ---
 
-import dataset 
+settings/tidyverse 
 ```{r}
 library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+```
+
+
+import dataset
+```{r}
 library(p8105.datasets)
 
 data(nyc_airbnb)
+```
+
+## Brainstorm questions 
+
+* investigate price based on neighborhood/borough 
+  * does dates affect the price as well?
+* does the type of unit affect rating/price?
+* what about zip codes?
+* what rental has the highest revieews?
+* are there any connections between price and other variables 
+* prices over time?
+  * prices before or after the pandemic?
+* how else did the pandemic affect airbnb in nyc?
+* does the name of the rental affect the price/rating?
+* what does the number of days available have to do with anything else?
+
+airbnb prices by neighbourhood
+```{r}
+nyc_airbnb |> 
+  select(name, neighbourhood_group, price) |> 
+  group_by(neighbourhood_group) |> 
+  summarize(mean_price = mean(price)) |> 
+  ggplot(aes(x=neighbourhood_group, y = mean_price)) +
+  geom_col()
+```
+
+
+lets look at prices first
+```{r}
+nyc_airbnb |> 
+  drop_na(price) |> 
+  group_by(neighbourhood_group) |> 
+  summarize(
+    mean_price = mean(price),
+    min_price = min(price),
+    max_price = max(price)
+  )
+```
+
+what about room type in a given neighborhood 
+```{r}
+nyc_airbnb |> 
+  drop_na(price) |> 
+  group_by(room_type, neighbourhood_group) |> 
+  summarize(
+    mean_price = mean(price)
+  ) |> 
+  pivot_wider(
+    names_from = room_type, 
+    values_from = mean_price
+  )
+```
+
+
+counting 
+```{r}
+nyc_airbnb |> 
+  count(neighbourhood_group, room_type)
+```
+
+make some plots (remember to look at extreme values...)
+
+```{r}
+nyc_airbnb |> 
+  ggplot(aes(x=price)) +
+  geom_histogram() +
+  facet_grid(room_type ~ neighbourhood_group) +
+  scale_x_continuous(limits = c(0,1000))
+```
+
+
+look at price of airbnb in manhattan 
+```{r}
+nyc_airbnb |> 
+  filter(neighbourhood_group == "Manhattan", 
+         price < 500, 
+         room_type == "Entire home/apt") |> 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) |> 
+  ggplot(aes(x = neighbourhood, y = price)) + 
+  geom_violin() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+(remember to look at extreme values...)
+```{r}
+nyc_airbnb |> 
+  filter(price > 9000) 
+```
+
+```{r}
+nyc_airbnb |> 
+  filter(calculated_host_listings_count > 30) 
 ```
 
