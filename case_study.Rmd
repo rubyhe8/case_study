@@ -5,8 +5,7 @@ date: "2025-10-07"
 output: html_document
 ---
 
-settings/tidyverse 
-```{r}
+```{r include = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
 
 knitr::opts_chunk$set(
